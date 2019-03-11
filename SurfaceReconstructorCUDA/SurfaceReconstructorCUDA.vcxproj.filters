@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="catpaw">
+      <UniqueIdentifier>{1ebc2ca9-4e59-4d7f-8412-03988e9abcf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cuda">
+      <UniqueIdentifier>{6d6832a9-60cd-4926-b7d4-e02a197eccb2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="catpaw\cpXMLHelper.cpp">
+      <Filter>catpaw</Filter>
+    </ClCompile>
+    <ClCompile Include="catpaw\geometry.cpp">
+      <Filter>catpaw</Filter>
+    </ClCompile>
+    <ClCompile Include="catpaw\glUtils.cpp">
+      <Filter>catpaw</Filter>
+    </ClCompile>
+    <ClCompile Include="catpaw\objbuilder.cpp">
+      <Filter>catpaw</Filter>
+    </ClCompile>
+    <ClCompile Include="catpaw\Camera.cpp">
+      <Filter>catpaw</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MarchingCube.cpp" />
+    <ClCompile Include="SurfaceReconstructor.cpp" />
+    <ClCompile Include="ZIndexGrid.cpp" />
+    <ClCompile Include="glad.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="catpaw\cpXMLhelper.h">
+      <Filter>catpaw</Filter>
+    </ClInclude>
+    <ClInclude Include="catpaw\geometry.h">
+      <Filter>catpaw</Filter>
+    </ClInclude>
+    <ClInclude Include="catpaw\geometry_helper.h">
+      <Filter>catpaw</Filter>
+    </ClInclude>
+    <ClInclude Include="catpaw\glUtils.h">
+      <Filter>catpaw</Filter>
+    </ClInclude>
+    <ClInclude Include="catpaw\objbuilder.h">
+      <Filter>catpaw</Filter>
+    </ClInclude>
+    <ClInclude Include="catpaw\vec_define.h">
+      <Filter>catpaw</Filter>
+    </ClInclude>
+    <ClInclude Include="catpaw\Camera.h">
+      <Filter>catpaw</Filter>
+    </ClInclude>
+    <ClInclude Include="catpaw\cpTimer.h">
+      <Filter>catpaw</Filter>
+    </ClInclude>
+    <ClInclude Include="catpaw\cpToolBox.h">
+      <Filter>catpaw</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda\ZIndexGrid.cuh">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="SurfaceReconstructor.hpp" />
+    <ClInclude Include="ZIndexGrid.hpp" />
+    <ClInclude Include="Grids.h" />
+    <ClInclude Include="MarchingCube.h" />
+    <ClInclude Include="MarchingCubeConstants.h" />
+    <ClInclude Include="SurfaceGrids.h" />
+    <ClInclude Include="IndexMap.hpp" />
+    <ClInclude Include="Mesh.hpp" />
+    <ClInclude Include="ParticleData.hpp" />
+    <ClInclude Include="SPHHelper.hpp" />
+    <ClInclude Include="cuda\ParticleDataCuda.cuh">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda\cuda_common.cuh">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda\kernel_functions.cuh">
+      <Filter>cuda</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="cuda\ZIndexGrid.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="cuda\kernel_functions.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="cuda\SurfaceReconstructorCUDA.cpp">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="cuda\SurfaceReconstructorCUDA.cuh">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="cuda\host_functions.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+  </ItemGroup>
+</Project>
