@@ -7,7 +7,7 @@
 	<surfaceCellWidth> 0.5 </surfaceCellWidth>
 	<normThreshold> 0.5 </normThreshold>
 	<neighborThreshold> 25 </neighborThreshold>
-	<isoValue> 0.5 </isoValue>
+	<isoValue> 0 </isoValue>
 </uniform>
 
 <small>
@@ -17,7 +17,7 @@
 	<surfaceCellWidth> 0.0025 </surfaceCellWidth>
 	<normThreshold> 0.5 </normThreshold>
 	<neighborThreshold> 25 </neighborThreshold>
-	<isoValue> 0 </isoValue>
+	<isoValue> -0.0025 </isoValue>
 </small>
 
 </SurfaceReconstruction>

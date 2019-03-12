@@ -29,6 +29,15 @@
     <ClCompile Include="SurfaceReconstructor.cpp" />
     <ClCompile Include="ZIndexGrid.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="cuda\ParticleDataCUDA.cpp">
+      <Filter>cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="cuda\SurfaceGridCUDA.cpp">
+      <Filter>cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="cuda\MarchingCubeCUDA.cpp">
+      <Filter>cuda</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="catpaw\cpXMLhelper.h">
@@ -58,9 +67,6 @@
     <ClInclude Include="catpaw\cpToolBox.h">
       <Filter>catpaw</Filter>
     </ClInclude>
-    <ClInclude Include="cuda\ZIndexGrid.cuh">
-      <Filter>cuda</Filter>
-    </ClInclude>
     <ClInclude Include="SurfaceReconstructor.hpp" />
     <ClInclude Include="ZIndexGrid.hpp" />
     <ClInclude Include="Grids.h" />
@@ -71,30 +77,39 @@
     <ClInclude Include="Mesh.hpp" />
     <ClInclude Include="ParticleData.hpp" />
     <ClInclude Include="SPHHelper.hpp" />
-    <ClInclude Include="cuda\ParticleDataCuda.cuh">
+    <ClInclude Include="cuda\ParticleDataCuda.h">
       <Filter>cuda</Filter>
     </ClInclude>
-    <ClInclude Include="cuda\cuda_common.cuh">
+    <ClInclude Include="cuda\kernel_functions.h">
       <Filter>cuda</Filter>
     </ClInclude>
-    <ClInclude Include="cuda\kernel_functions.cuh">
+    <ClInclude Include="cuda\cuda_common.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda\ZIndexGridCUDA.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda\SurfaceGridCUDA.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda\MarchingCubeCUDA.h">
       <Filter>cuda</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="cuda\ZIndexGrid.cu">
-      <Filter>cuda</Filter>
-    </CudaCompile>
     <CudaCompile Include="cuda\kernel_functions.cu">
       <Filter>cuda</Filter>
     </CudaCompile>
     <CudaCompile Include="cuda\SurfaceReconstructorCUDA.cpp">
       <Filter>cuda</Filter>
     </CudaCompile>
-    <CudaCompile Include="cuda\SurfaceReconstructorCUDA.cuh">
+    <CudaCompile Include="cuda\host_functions.cu">
       <Filter>cuda</Filter>
     </CudaCompile>
-    <CudaCompile Include="cuda\host_functions.cu">
+    <CudaCompile Include="cuda\SurfaceReconstructorCUDA.h">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="cuda\ZIndexGridCUDA.cpp">
       <Filter>cuda</Filter>
     </CudaCompile>
   </ItemGroup>

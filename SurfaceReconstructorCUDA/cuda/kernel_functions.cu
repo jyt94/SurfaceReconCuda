@@ -1,13 +1,14 @@
 
 
 #include <cuda_runtime.h>
-#include "ZIndexGrid.cuh"
+#include "kernel_functions.h"
 #include "SPHHelper.hpp"
 
+#include "MarchingCube.h"
 
-__constant__ ZIndexGridCUDA device_zgrid;
 __constant__ int device_indexMap[1024];
 __constant__ SPHHelper device_sphhelper;
+__constant__ cint3 device_neighborCells[27];
 
 __inline__ __device__ int GetCellHash(cint3 pCoord, int resolution) {
 	if (pCoord.x<0 || pCoord.x>=resolution ||
@@ -108,7 +109,7 @@ __global__ void ComputeColorField(
 	auto hash = zgrid.particleHashes[i];
 
 	int numNeighbors=0;
-	cfloat3 normal;
+	cfloat3 normal(0,0,0);
 	float vol = spacing*spacing*spacing;
 
 	for (int xx=-1; xx<=1; xx++)
@@ -120,6 +121,8 @@ __global__ void ComputeColorField(
 					continue;
 
 				int startIndex = zgrid.startIndices[hash1];
+				if(startIndex == CELL_EMPTY)
+					continue;
 				int endIndex = zgrid.endIndices[hash1];
 				for (int j=startIndex; j<endIndex; j++) {
 					if(j==i)
@@ -136,9 +139,74 @@ __global__ void ComputeColorField(
 			}
 	normal = normal*vol;
 	auto nnorm = normal.Norm();
-	//printf("%d %d %f\n", i, numNeighbors, nnorm);
 	if(nnorm > normThres || numNeighbors<neighborThres)
 		surfaceParticleMark[i] = 1;
 	else
 		surfaceParticleMark[i] = 0;
+}
+
+
+__global__ void  ComputeScalarValues(
+	ZIndexGridCUDA zgrid,
+	SurfaceGridCUDA sgrid,
+	float particleSpacing,
+	float infectRadius
+) {
+	uint i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
+	if(i >= sgrid.numSurfaceVertices)
+		return;
+
+	auto& vertex = sgrid.device_surfaceVertices[i];
+	auto gridIndex = vertex.gridIndex;
+	auto coord = GetCoordinate(gridIndex, sgrid.vertexResolution);
+	auto xi = GetPosition(coord, sgrid.xmin, sgrid.cellWidth);
+
+	auto zcoord = GetCoordinate(xi, zgrid.xmin, zgrid.cellWidth);
+	auto zhash = GetCellHash(zcoord, zgrid.resolution);
+	if(zhash == INVALID_CELL)
+		return;
+
+	float pVol = particleSpacing * particleSpacing * particleSpacing;
+	cfloat3 xAverage(0,0,0);
+	cmat3 xAverageGradient;
+	float sumW = 0;
+	cfloat3 sumNablaW(0,0,0);
+
+	for (int i=0; i<27; i++) {
+		auto coord1 = zcoord + device_neighborCells[i];
+		auto hash1 = GetCellHash(coord1, zgrid.resolution);
+		if(hash1 == INVALID_CELL)
+			continue;
+		
+		int startIndex = zgrid.startIndices[hash1];
+		if (startIndex == CELL_EMPTY)
+			continue;
+		int endIndex = zgrid.endIndices[hash1];
+
+		// for each neighboring particle
+		for (int j=startIndex; j<endIndex; j++) {
+
+			auto& xj = zgrid.particles[j].pos;
+			auto xij = xi - xj;
+			auto d = xij.Norm();
+			if (d >= infectRadius)
+				continue;
+			float w_ij = device_sphhelper.Cubic(d);
+			cfloat3 nablaW = device_sphhelper.CubicGradient(xij);
+			xAverage += xj * w_ij;
+			sumW += w_ij;
+			sumNablaW += nablaW;
+
+			xAverageGradient.Add(TensorProduct(xj, nablaW));
+		}
+	}
+
+	float scalarValue;
+	if (abs(sumW)>EPSILON) {
+		xAverage /= sumW;
+		scalarValue = (xi - xAverage).Norm() - particleSpacing;
+	}
+	else
+		scalarValue = OUTSIDE;
+	vertex.value = scalarValue;
 }

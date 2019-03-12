@@ -3,13 +3,13 @@
 #include "catpaw/vec_define.h"
 
 #define INVALID_CELL 999999999
-#define CELL_EMPTY -1
+#define CELL_EMPTY 0xffffffff
 
 inline HDFUNC cint3 GetCoordinate(cfloat3 pos, cfloat3 xmin, float cellWidth) {
 	cint3 pCoord;
-	pCoord.x = floor(pos.x - xmin.x)/cellWidth;
-	pCoord.y = floor(pos.y - xmin.y)/cellWidth;
-	pCoord.z = floor(pos.z - xmin.z)/cellWidth;
+	pCoord.x = floor((pos.x - xmin.x)/cellWidth);
+	pCoord.y = floor((pos.y - xmin.y)/cellWidth);
+	pCoord.z = floor((pos.z - xmin.z)/cellWidth);
 	return pCoord;
 }
 
@@ -29,4 +29,8 @@ inline HDFUNC int GetIndex(cint3 coord, cint3 resolution) {
 
 	return coord.z*(resolution.y*resolution.x)
 		+ coord.y*resolution.x + coord.x;
+}
+
+inline HDFUNC cfloat3 GetPosition(cint3 coord, cfloat3 xmin, float cellWidth) {
+	return xmin + coord*cellWidth;
 }

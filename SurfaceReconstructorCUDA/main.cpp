@@ -1,6 +1,6 @@
 
 #include "SurfaceReconstructor.hpp"
-#include "cuda/SurfaceReconstructorCUDA.cuh"
+#include "cuda/SurfaceReconstructorCUDA.h"
 
 int main_(){
     
@@ -58,8 +58,9 @@ void Test() {
 void TestCUDA() {
 	SurfaceReconstructorCUDA worker;
 	worker.LoadConfig("small");
-	worker.inputFile = "particledata/000.txt";
-	worker.outFile = "testcuda.obj";
+	string f = "075";
+	worker.inputFile = "particledata/"+f+".txt";
+	worker.outFile = f+".obj";
 	worker.ExtractSurface();
 }
 
