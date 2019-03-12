@@ -45,8 +45,6 @@ public:
 
 	void Triangulate();
 
-	void OutputMesh();
-
 	void Release();
 
 };

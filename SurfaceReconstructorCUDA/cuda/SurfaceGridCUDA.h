@@ -32,10 +32,5 @@ public:
 
 	void InsertSurfaceVertex(cint3 coord);
 
-	void Release() {
-		delete[] surfaceIndices;
-		delete surfaceVertices;
-		cudaFree(device_surfaceIndices);
-		cudaFree(device_surfaceVertices);
-	}
+	void Release();
 };

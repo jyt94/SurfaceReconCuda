@@ -40,6 +40,7 @@ void SurfaceReconstructorCUDA::ExtractSurface() {
 
 	ComputeScalarValues();
 	Triangulate();
+	Release();
 }
 
 void SurfaceReconstructorCUDA::LoadParticle() {
@@ -54,7 +55,7 @@ void SurfaceReconstructorCUDA::LoadParticle() {
 void SurfaceReconstructorCUDA::SetupGrids() {
 	cout<<"preparing grids...\n";
 	
-	//setup zgrids
+	
 	zGrid.BindParticles(particleData);
 	cfloat3 min, max;
 	min = particleData.xmin - padding*2;
@@ -63,7 +64,7 @@ void SurfaceReconstructorCUDA::SetupGrids() {
 	zGrid.AllocateDeviceBuffer();
 	zGrid.BindParticles(particleData);
 
-	//setup surface grids
+	
 	min = particleData.xmin - padding;
 	max = particleData.xmax + padding;
 	surfaceGrid.SetSize(min, max, particleSpacing*0.5);

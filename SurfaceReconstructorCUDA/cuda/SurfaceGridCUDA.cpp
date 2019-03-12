@@ -47,3 +47,10 @@ void SurfaceGridCUDA::InsertSurfaceVertex(cint3 coord) {
 	else
 		return;
 }
+
+void SurfaceGridCUDA::Release() {
+	delete[] surfaceIndices;
+	delete surfaceVertices;
+	cudaFree(device_surfaceIndices);
+	cudaFree(device_surfaceVertices);
+}
