@@ -18,7 +18,7 @@ void TestParticleData() {
 	SurfaceReconstructor surfaceReconstructor;
 
 	surfaceReconstructor.LoadConfig("small");
-	surfaceReconstructor.LoadParticle("particledata/000.txt");
+	surfaceReconstructor.LoadParticle("particledata/001.txt");
 	surfaceReconstructor.SetupGrids();
 	surfaceReconstructor.ExtractSurface();
 }
@@ -27,7 +27,7 @@ void TestCUDA() {
 	SurfaceReconstructorCUDA worker;
 	worker.LoadConfig("small");
 
-	for (int i=31; i<100; i++) {	
+	for (int i=1; i<2; i++) {	
 		char f[100];
 		sprintf(f, "%03d",i);
 		worker.inputFile = "particledata/"+string(f)+".txt";
@@ -37,8 +37,8 @@ void TestCUDA() {
 }
 
 int main() {
-	//TestParticleData();
-	TestCUDA();
+	TestParticleData();
+	//TestCUDA();
 
 	return 0;
 }

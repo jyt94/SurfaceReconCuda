@@ -45,6 +45,8 @@ void SurfaceReconstructor::ComputeColorFieldAndMarkParticles(){
                 continue;
             
             int startIndice = zGrid.startIndices[pHash1];
+			if(startIndice==CELL_EMPTY)
+				continue;
             int endIndice = zGrid.endIndices[pHash1];
 
             // for each neighboring particle
@@ -98,6 +100,7 @@ void SurfaceReconstructor::ExtractSurfaceVertices(){
 			surfaceGrid.InsertSurfaceVertex(coord);
         }
     }
+	printf("surface vertices: %d\n", surfaceGrid.surfaceVertices.size());
 }
 
 
@@ -132,10 +135,10 @@ void SurfaceReconstructor::ComputeScalarValues(){
 		int numNeighbors = 0;
 		cfloat3 normal;
 		float pVol = particleSpacing * particleSpacing * particleSpacing;
-		cfloat3 xAverage;
+		cfloat3 xAverage(0,0,0);
 		cmat3 xAverageGradient;
 		float sumW = 0;
-		cfloat3 sumNablaW;
+		cfloat3 sumNablaW(0,0,0);
 
 		// for each neighbor cell
 		for (int xx=-1; xx<=1; xx++)
@@ -147,6 +150,8 @@ void SurfaceReconstructor::ComputeScalarValues(){
 						continue;
 
 					int startIndice = zGrid.startIndices[pHash1];
+					if (startIndice==CELL_EMPTY)
+						continue;
 					int endIndice = zGrid.endIndices[pHash1];
 
 					// for each neighboring particle
@@ -164,21 +169,21 @@ void SurfaceReconstructor::ComputeScalarValues(){
 						sumNablaW += nablaW;
 
 						xAverageGradient.Add(TensorProduct(xj, nablaW));
-						numNeighbors ++;
 					}
 				}
 		
 		float scalarValue;
 		if (abs(sumW)>EPSILON) {
-			cmat3 tmp;
-			tmp = TensorProduct(xAverage, sumNablaW);
-			tmp.Multiply(1.0f/sumW/sumW);
+			//cmat3 tmp;
+			//tmp = TensorProduct(xAverage, sumNablaW);
+			//tmp.Multiply(1.0f/sumW/sumW);
 
 			xAverage /= sumW;
-			xAverageGradient.Multiply(1.0f/sumW);
-			xAverageGradient.Minus(tmp);
+			//xAverageGradient.Multiply(1.0f/sumW);
+			//xAverageGradient.Minus(tmp);
 
 			float f = 1;
+			scalarValue = (xi - xAverage).Norm() -  f * particleSpacing;
 			/*float t_high = 3.5, t_low = 0.4;
 			float evMax = maxEV(xAverageGradient);
 			if(evMax < t_low )
@@ -188,11 +193,12 @@ void SurfaceReconstructor::ComputeScalarValues(){
 				f = gamma*gamma*gamma - 3*gamma*gamma + 3*gamma;
 				if(f<0) f = 0;
 			}*/
-			scalarValue = (xi - xAverage).Norm() -  f * particleSpacing;
 		}
 		else
 			scalarValue = OUTSIDE;
 		surfaceGrid.surfaceVertices[i].value = scalarValue;
+		if(!(scalarValue < 100))
+			printf("%d %f\n", i, scalarValue);
     }
 }
 
@@ -203,7 +209,7 @@ void SurfaceReconstructor::Triangulate(){
 	MarchingCube marchingCube;
 	marchingCube.surfaceGrid = & surfaceGrid;
 	marchingCube.SetCubeWidth(surfaceGrid.cellWidth);
-	marchingCube.isoLevel = isoValue;
+	marchingCube.isoLevel = -0.0025;
 
 	marchingCube.Marching();
 	marchingCube.mesh.Output("test.obj");

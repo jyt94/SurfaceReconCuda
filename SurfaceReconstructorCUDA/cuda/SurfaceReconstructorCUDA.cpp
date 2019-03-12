@@ -29,6 +29,8 @@ void SurfaceReconstructorCUDA::LoadConfig(const char* config) {
 	normThres = reader.GetFloat("normThreshold");
 	neighborThres = reader.GetInt("neighborThreshold");
 	isoValue = reader.GetFloat("isoValue");
+
+	cudaMemcpyToSymbol(device_sphhelper, &sphHelper, sizeof(SPHHelper));
 }
 
 void SurfaceReconstructorCUDA::ExtractSurface() {
@@ -69,8 +71,6 @@ void SurfaceReconstructorCUDA::SetupGrids() {
 	max = particleData.xmax + padding;
 	surfaceGrid.SetSize(min, max, particleSpacing*0.5);
 	surfaceGrid.AllocateDeviceBuffer();
-
-	cudaMemcpyToSymbol(device_sphhelper, &sphHelper, sizeof(SPHHelper));
 }
 
 
