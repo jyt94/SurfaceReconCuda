@@ -11,13 +11,13 @@
 </uniform>
 
 <small>
-	<particleSpacing> 0.005 </particleSpacing>
-	<infectRadius> 0.015 </infectRadius>
+	<particleSpacing> 0.01 </particleSpacing>
+	<infectRadius> 0.03 </infectRadius>
 	<padding> 0.01 </padding>
-	<surfaceCellWidth> 0.0025 </surfaceCellWidth>
+	<surfaceCellWidth> 0.005 </surfaceCellWidth>
 	<normThreshold> 0.5 </normThreshold>
 	<neighborThreshold> 25 </neighborThreshold>
-	<isoValue> -0.0025 </isoValue>
+	<isoValue> -0.005 </isoValue>
 </small>
 
 </SurfaceReconstruction>

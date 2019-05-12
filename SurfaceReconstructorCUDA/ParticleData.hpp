@@ -3,8 +3,15 @@
 #include "catpaw/vec_define.h"
 #include "catpaw/geometry_helper.h"
 
+template <int T>
+struct VecfN {
+	float x[T];
+};
+typedef VecfN<3> Vecf3;
+
 struct Particle{
     cfloat3 pos;
+	Vecf3 vf;
 };
 
 class ParticleData{
@@ -36,6 +43,10 @@ class ParticleData{
         printf3("xmax",xmax);
     }
 
+	bool valid(cfloat3& p) {
+		return p.x > -0.5 && p.x < 0.5 && p.y>0 && p.y<2 && p.z>-0.5 && p.z < 0.5;
+	}
+
     void LoadFromFile(const char* filePath){
         FILE* fp = fopen(filePath, "r");
         if(fp==NULL){
@@ -47,12 +58,20 @@ class ParticleData{
         printf("%s",buf);
 
         int vId;
-        Particle tmpParticle;
-
+        Particle p;
+		float vf[3];
+		int type;
         while(fgets(buf,sizeof(buf),fp)!=NULL){
-            sscanf(buf, "%d %f %f %f",
-            &vId, &tmpParticle.pos.x, &tmpParticle.pos.y, &tmpParticle.pos.z);
-            particles.push_back(tmpParticle);
+            sscanf(buf, "%d %f %f %f %f %f %f %d",
+            &vId, &p.pos.x, &p.pos.y, &p.pos.z,
+				&p.vf.x[0], &p.vf.x[1], &p.vf.x[2], &type);
+			if (type != 0)
+				continue;
+
+			if ( !valid(p.pos) )
+				continue;
+
+            particles.push_back(p);
         }
 
         fclose(fp);

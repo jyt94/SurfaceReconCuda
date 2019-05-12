@@ -118,6 +118,8 @@ inline float maxEV(cmat3& mat) {
 	return fmax(fmax(a,b),c);
 }
 
+#include "catpaw/cpEigen.h"
+
 void SurfaceReconstructor::ComputeScalarValues(){
 
 	printf("Computing scalar values...\n");
@@ -174,31 +176,31 @@ void SurfaceReconstructor::ComputeScalarValues(){
 		
 		float scalarValue;
 		if (abs(sumW)>EPSILON) {
-			//cmat3 tmp;
-			//tmp = TensorProduct(xAverage, sumNablaW);
-			//tmp.Multiply(1.0f/sumW/sumW);
+			cmat3 tmp;
+			tmp = TensorProduct(xAverage, sumNablaW);
+			tmp.Multiply(1.0f/sumW/sumW);
 
 			xAverage /= sumW;
-			//xAverageGradient.Multiply(1.0f/sumW);
-			//xAverageGradient.Minus(tmp);
+			xAverageGradient.Multiply(1.0f/sumW);
+			xAverageGradient.Minus(tmp);
 
 			float f = 1;
-			scalarValue = (xi - xAverage).Norm() -  f * particleSpacing;
-			/*float t_high = 3.5, t_low = 0.4;
-			float evMax = maxEV(xAverageGradient);
+			float t_high = 3.5, t_low = 0.4;
+			//float evMax = maxEV(xAverageGradient);
+			float evMax = eigenMax(xAverageGradient);
 			if(evMax < t_low )
 				f = 1;
 			else {
 				float gamma = (t_high - evMax)/(t_high - t_low);
 				f = gamma*gamma*gamma - 3*gamma*gamma + 3*gamma;
-				if(f<0) f = 0;
-			}*/
+				if(f<0) 
+					f = 0;
+			}
+			scalarValue = (xi - xAverage).Norm() -  f * particleSpacing;
 		}
 		else
 			scalarValue = OUTSIDE;
 		surfaceGrid.surfaceVertices[i].value = scalarValue;
-		if(!(scalarValue < 100))
-			printf("%d %f\n", i, scalarValue);
     }
 }
 

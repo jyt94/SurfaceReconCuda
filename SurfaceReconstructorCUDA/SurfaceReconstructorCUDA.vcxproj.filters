@@ -95,6 +95,12 @@
     <ClInclude Include="cuda\MarchingCubeCUDA.h">
       <Filter>cuda</Filter>
     </ClInclude>
+    <ClInclude Include="catpaw\cpEigen.h">
+      <Filter>catpaw</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda\ColorGrid.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="cuda\kernel_functions.cu">

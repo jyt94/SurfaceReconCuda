@@ -6,6 +6,7 @@
 #include "ParticleDataCuda.h"
 #include "ZIndexGridCUDA.h"
 #include "SurfaceGridCUDA.h"
+#include "ColorGrid.h"
 
 class SurfaceReconstructorCUDA {
 public:
@@ -23,16 +24,22 @@ public:
 	ParticleDataCUDA particleData;
 	ZIndexGridCUDA zGrid;
 	SurfaceGridCUDA surfaceGrid;
-	
+	ColorGrid colorGrid;
+
+	string colorFileName;
+
 	int* surfaceParticleMark;
 	int* device_surfaceParticleMark;
 
 	void LoadConfig(const char* config);
 
 	void ExtractSurface();
+	void ExtractColor();
 
 	void LoadParticle();
-	void SetupGrids();
+	void SetupZGrid();
+	void SetupSurfaceGrid();
+	void SetupColorGrids();
 
 	void ExtractSurfaceParticles();
 	void SortParticles();
@@ -42,6 +49,8 @@ public:
 
 
 	void ComputeScalarValues();
+	void ComputeColorValues();
+	void OutputColorValues();
 
 	void Triangulate();
 

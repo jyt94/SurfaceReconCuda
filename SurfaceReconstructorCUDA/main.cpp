@@ -18,7 +18,7 @@ void TestParticleData() {
 	SurfaceReconstructor surfaceReconstructor;
 
 	surfaceReconstructor.LoadConfig("small");
-	surfaceReconstructor.LoadParticle("particledata/001.txt");
+	surfaceReconstructor.LoadParticle("particledata/000.txt");
 	surfaceReconstructor.SetupGrids();
 	surfaceReconstructor.ExtractSurface();
 }
@@ -27,18 +27,38 @@ void TestCUDA() {
 	SurfaceReconstructorCUDA worker;
 	worker.LoadConfig("small");
 
-	for (int i=1; i<2; i++) {	
+	string wkd = "../data/";
+	wkd = "D:/jyt/Coding/Simulation/2019_1/SolverInterface - ¸±±¾/SolverInterface/results/case 0 wcsph fluid pillar/data/";
+
+	cout << worker.inputFile << endl;
+	int st = 0;
+	int ed = 1;
+
+	for (int i=st; i<ed; i++) {	
 		char f[100];
-		sprintf(f, "%03d",i);
-		worker.inputFile = "particledata/"+string(f)+".txt";
-		worker.outFile = "particledata/mesh/"+string(f)+".obj";
-		worker.ExtractSurface();
+		sprintf(f, "%d",i);
+		worker.inputFile = wkd+string(f)+".txt";
+		
+		worker.outFile = wkd+"mesh/"+string(f)+".obj";
+		//worker.ExtractSurface();
+		worker.colorFileName = wkd + "mesh/" + string(f);
+		worker.ExtractColor();
 	}
 }
+#include "catpaw/cpEigen.h"
 
 int main() {
-	TestParticleData();
-	//TestCUDA();
+	
+	//TestParticleData();
+	
+	TestCUDA();
+
+	/*float t[9]={
+		1,2,0, -2,1,2, 1,3,1
+	};
+	cmat3 a(t);
+	printf("ev %f\n",eigenMax(a));*/
+
 
 	return 0;
 }

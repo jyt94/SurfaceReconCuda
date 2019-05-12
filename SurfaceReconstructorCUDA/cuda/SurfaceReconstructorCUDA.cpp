@@ -35,7 +35,10 @@ void SurfaceReconstructorCUDA::LoadConfig(const char* config) {
 
 void SurfaceReconstructorCUDA::ExtractSurface() {
 	LoadParticle();
-	SetupGrids();
+
+
+	SetupZGrid();
+	SetupSurfaceGrid();
 
 	ExtractSurfaceParticles();
 	ExtractSurfaceVertices();
@@ -44,6 +47,24 @@ void SurfaceReconstructorCUDA::ExtractSurface() {
 	Triangulate();
 	Release();
 }
+
+void SurfaceReconstructorCUDA::ExtractColor() {
+	LoadParticle();
+	SetupZGrid();
+	SetupColorGrids();
+	
+	SortParticles();
+	ComputeColorValues();
+	OutputColorValues();
+	
+	delete[] surfaceParticleMark;
+	cudaFree(device_surfaceParticleMark);
+
+	particleData.Release();
+	zGrid.Release();
+	colorGrid.Release();
+}
+
 
 void SurfaceReconstructorCUDA::LoadParticle() {
 	cout<<"loading particle...\n";
@@ -54,10 +75,7 @@ void SurfaceReconstructorCUDA::LoadParticle() {
 	cudaMalloc(&device_surfaceParticleMark, sizeof(int)*particleData.size());
 }
 
-void SurfaceReconstructorCUDA::SetupGrids() {
-	cout<<"preparing grids...\n";
-	
-	
+void SurfaceReconstructorCUDA::SetupZGrid() {
 	zGrid.BindParticles(particleData);
 	cfloat3 min, max;
 	min = particleData.xmin - padding*2;
@@ -65,12 +83,20 @@ void SurfaceReconstructorCUDA::SetupGrids() {
 	zGrid.SetSize(min, max, infectRadius);
 	zGrid.AllocateDeviceBuffer();
 	zGrid.BindParticles(particleData);
+}
 
-	
-	min = particleData.xmin - padding;
-	max = particleData.xmax + padding;
-	surfaceGrid.SetSize(min, max, particleSpacing*0.5);
+void SurfaceReconstructorCUDA::SetupSurfaceGrid() {
+	auto min = particleData.xmin - padding;
+	auto max = particleData.xmax + padding;
+	surfaceGrid.SetSize(min, max, surfaceCellWidth);
 	surfaceGrid.AllocateDeviceBuffer();
+}
+
+void SurfaceReconstructorCUDA::SetupColorGrids() {
+	auto min = particleData.xmin - padding;
+	auto max = particleData.xmax + padding;
+	colorGrid.SetSize(min, max, surfaceCellWidth);
+	colorGrid.AllocateDeviceBuffer();
 }
 
 
@@ -145,6 +171,57 @@ void SurfaceReconstructorCUDA::ComputeScalarValues() {
 		infectRadius
 	);
 	surfaceGrid.CopyToHost();
+}
+
+void SurfaceReconstructorCUDA::ComputeColorValues() {
+	cout << "computing color values\n";
+	ComputeColorValues_Host(
+		zGrid,
+		colorGrid,
+		particleSpacing,
+		infectRadius
+	);
+}
+
+void SurfaceReconstructorCUDA::OutputColorValues() {
+	//mitsuba vol data format
+	colorGrid.CopyToHost();
+	FILE* fp;
+	string path = colorFileName + "_rgb.vol";
+	fp = fopen(path.c_str(), "wb");
+	char vol[3] = { 'V','O','L' };
+	char version = 3;
+	int encodetype = 1;
+	int channels = 3;
+	int _channels = 1;
+	float size[6];
+
+	size[0] = colorGrid.xmin.x;
+	size[1] = colorGrid.xmin.y;
+	size[2] = colorGrid.xmin.z;
+	size[3] = colorGrid.xmax.x;
+	size[4] = colorGrid.xmax.y;
+	size[5] = colorGrid.xmax.z;
+	
+	fwrite(vol, sizeof(char), 3, fp);
+	fwrite(&version, sizeof(version), 1, fp);
+
+
+	for (int i = 0; i < colorGrid.numVertices; i++) {
+		auto & rgb = (*colorGrid.rgb)[i];
+		//fprintf(fp, "%f %f %f\n", rgb.x, rgb.y, rgb.z);
+		fwrite(&rgb, sizeof(cfloat3), 1, fp);
+	}
+	fclose(fp);
+
+	path = colorFileName + "_den.vol";
+	fp = fopen(path.c_str(), "wb");
+	for (int i = 0; i < colorGrid.numVertices; i++) {
+		auto & d = (*colorGrid.density)[i];
+		//fprintf(fp, "%f\n", d);
+		fwrite(&d, sizeof(float), 1, fp);
+	}
+	fclose(fp);
 }
 
 void SurfaceReconstructorCUDA::Triangulate() {
