@@ -1,8 +1,31 @@
 
+#include <cuda_runtime.h>
 
-#include "kernel_functions.h"
+#include "ZIndexGridCUDA.h"
+#include "SurfaceGridCUDA.h"
+#include "ColorGrid.h"
+
 #include "cuda_common.h"
 #include "helper_cuda.h"
+
+
+__global__ void ComputeParticleHash(ZIndexGridCUDA zgrid);
+__global__ void ReorderDataAndFindCellStart(ZIndexGridCUDA zgrid);
+__global__ void ComputeColorField(
+	ZIndexGridCUDA zgrid,
+	float spacing,
+	float infectRadius,
+	float normThres,
+	int neighborThres,
+	int* surfaceParticleMark
+);
+__global__ void ComputeScalarValues(
+	ZIndexGridCUDA zgrid,
+	SurfaceGridCUDA sgrid,
+	float particleSpacing,
+	float infectRadius
+);
+
 
 void ReorderDataAndFindCellStart_Host(ZIndexGridCUDA& zgrid) {
 	int numBlocks, numThreads;
@@ -102,7 +125,7 @@ __global__ void  ComputeColorValues(
 	float infectRadius
 ) {
 	uint i = __umul24(blockIdx.x, blockDim.x) + threadIdx.x;
-	if (i >= cgrid.numVertices)
+	if (i >= cgrid.numCells)
 		return;
 
 	cfloat3 rgb(0, 0, 0);
@@ -110,13 +133,17 @@ __global__ void  ComputeColorValues(
 	for (int t = 0; t < 3; t++) vf.x[t] = 0;
 	float density = 0;
 
-	auto coord = GetCoordinate(i, cgrid.vertexResolution);
+	auto coord = GetCoordinate(i, cgrid.cellResolution);
 	auto xi = GetPosition(coord, cgrid.xmin, cgrid.cellWidth);
+	auto ofs = cgrid.cellWidth*0.5f;
+	xi += cfloat3(ofs, ofs, ofs);
 
 	auto zcoord = GetCoordinate(xi, zgrid.xmin, zgrid.cellWidth);
 	auto zhash = GetCellHash(zcoord, zgrid.resolution);
-	if (zhash == INVALID_CELL)
+	if (zhash == INVALID_CELL){
+		printf("invalid cell error in color interpolation\n");
 		return;
+	}
 
 	float pVol = particleSpacing * particleSpacing * particleSpacing;
 
@@ -155,11 +182,13 @@ __global__ void  ComputeColorValues(
 	}
 	else {
 		for (int i = 0; i < 3; i++) vf.x[i] /= sum;
+		//if(i%100==0)
+		//	printf("%f\n", density);
 	}
 	//compute color
-	rgb += cfloat3(1, 0, 0) * vf.x[0];
-	rgb += cfloat3(0, 1, 0) * vf.x[1];
-	rgb += cfloat3(0, 0, 1) * vf.x[2];
+	rgb += cgrid.palette[0] * vf.x[0];
+	rgb += cgrid.palette[1] * vf.x[1];
+	rgb += cgrid.palette[2] * vf.x[2];
 
 	cgrid.device_rgb[i] = rgb;
 	cgrid.device_density[i] = density;
@@ -174,7 +203,7 @@ void ComputeColorValues_Host(
 ) {
 	
 	int numBlocks, numThreads;
-	computeBlockSize(cgrid.vertexResolution.prod(), 256, numBlocks, numThreads);
+	computeBlockSize(cgrid.numCells, 256, numBlocks, numThreads);
 
 	ComputeColorValues << <numBlocks, numThreads >> > (
 		zgrid,

@@ -13,11 +13,10 @@ public:
 	cfloat3 xmax;
 	float cellWidth;
 	cint3 cellResolution;
-	cint3 vertexResolution;
 	int numCells;
-	int numVertices;
+	cfloat3 palette[3];
 	
-
+	//sampled at cell centers
 	vector<cfloat3>* rgb;
 	vector<float>* density;
 	cfloat3* device_rgb;
@@ -31,24 +30,22 @@ public:
 		cellResolution = ceil((xmax - xmin) / cellWidth);
 		numCells = cellResolution.prod();
 		xmax = xmin + cellResolution * cellWidth;
-		vertexResolution = cellResolution + cint3(1, 1, 1);
-		numVertices = vertexResolution.prod();
 
 		rgb = new vector<cfloat3>;
 		density = new vector<float>;
-		rgb->resize(vertexResolution.prod());
-		density->resize(numVertices);
+		rgb->resize(numCells);
+		density->resize(numCells);
 	}
 
 	void AllocateDeviceBuffer() {
-		cudaMalloc(&device_rgb, sizeof(cfloat3)*vertexResolution.prod());
-		cudaMalloc(&device_density, sizeof(float)*vertexResolution.prod());
+		cudaMalloc(&device_rgb, sizeof(cfloat3)*numCells);
+		cudaMalloc(&device_density, sizeof(float)*numCells);
 
 	}
 	
 	void CopyToHost() {
-		cudaMemcpy(rgb->data(), device_rgb, vertexResolution.prod() * sizeof(cfloat3), cudaMemcpyDeviceToHost);
-		cudaMemcpy(density->data(), device_density, vertexResolution.prod() * sizeof(float), cudaMemcpyDeviceToHost);
+		cudaMemcpy(rgb->data(), device_rgb, numCells * sizeof(cfloat3), cudaMemcpyDeviceToHost);
+		cudaMemcpy(density->data(), device_density, numCells * sizeof(float), cudaMemcpyDeviceToHost);
 	}
 	
 	void Release() {

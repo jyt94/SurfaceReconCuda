@@ -18,6 +18,9 @@
 	<normThreshold> 0.5 </normThreshold>
 	<neighborThreshold> 25 </neighborThreshold>
 	<isoValue> -0.005 </isoValue>
+	<color1> 255, 20, 0 </color1>
+	<color2> 20,  255, 0 </color2>
+	<color3> 0,0,255 </color3>
 </small>
 
 </SurfaceReconstruction>

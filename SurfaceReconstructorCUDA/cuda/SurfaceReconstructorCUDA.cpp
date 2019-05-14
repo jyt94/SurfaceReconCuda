@@ -30,6 +30,10 @@ void SurfaceReconstructorCUDA::LoadConfig(const char* config) {
 	neighborThres = reader.GetInt("neighborThreshold");
 	isoValue = reader.GetFloat("isoValue");
 
+	colorGrid.palette[0] = reader.GetFloat3("color1")/255;
+	colorGrid.palette[1] = reader.GetFloat3("color2")/255;
+	colorGrid.palette[2] = reader.GetFloat3("color3")/255;
+
 	cudaMemcpyToSymbol(device_sphhelper, &sphHelper, sizeof(SPHHelper));
 }
 
@@ -90,13 +94,15 @@ void SurfaceReconstructorCUDA::SetupSurfaceGrid() {
 	auto max = particleData.xmax + padding;
 	surfaceGrid.SetSize(min, max, surfaceCellWidth);
 	surfaceGrid.AllocateDeviceBuffer();
-}
+} 
 
 void SurfaceReconstructorCUDA::SetupColorGrids() {
 	auto min = particleData.xmin - padding;
 	auto max = particleData.xmax + padding;
+	
 	colorGrid.SetSize(min, max, surfaceCellWidth);
 	colorGrid.AllocateDeviceBuffer();
+
 }
 
 
@@ -187,36 +193,55 @@ void SurfaceReconstructorCUDA::OutputColorValues() {
 	//mitsuba vol data format
 	colorGrid.CopyToHost();
 	FILE* fp;
-	string path = colorFileName + "_rgb.vol";
-	fp = fopen(path.c_str(), "wb");
 	char vol[3] = { 'V','O','L' };
 	char version = 3;
 	int encodetype = 1;
 	int channels = 3;
 	int _channels = 1;
-	float size[6];
-
-	size[0] = colorGrid.xmin.x;
-	size[1] = colorGrid.xmin.y;
-	size[2] = colorGrid.xmin.z;
-	size[3] = colorGrid.xmax.x;
-	size[4] = colorGrid.xmax.y;
-	size[5] = colorGrid.xmax.z;
+	cfloat3 min, max;
 	
+	
+	string path = colorFileName + "_rgb.vol";
+	fp = fopen(path.c_str(), "wb");
 	fwrite(vol, sizeof(char), 3, fp);
 	fwrite(&version, sizeof(version), 1, fp);
+	fwrite(&encodetype, sizeof(encodetype), 1, fp);
+	fwrite(&colorGrid.cellResolution.x, sizeof(int), 1, fp);
+	fwrite(&colorGrid.cellResolution.y, sizeof(int), 1, fp);
+	fwrite(&colorGrid.cellResolution.z, sizeof(int), 1, fp);
+	fwrite(&channels, sizeof(channels), 1, fp);
+	fwrite(&colorGrid.xmin.x, sizeof(float), 1, fp);
+	fwrite(&colorGrid.xmin.y, sizeof(float), 1, fp);
+	fwrite(&colorGrid.xmin.z, sizeof(float), 1, fp);
+	fwrite(&colorGrid.xmax.x, sizeof(float), 1, fp);
+	fwrite(&colorGrid.xmax.y, sizeof(float), 1, fp);
+	fwrite(&colorGrid.xmax.z, sizeof(float), 1, fp);
 
-
-	for (int i = 0; i < colorGrid.numVertices; i++) {
+	for (int i = 0; i < colorGrid.numCells; i++) {
 		auto & rgb = (*colorGrid.rgb)[i];
 		//fprintf(fp, "%f %f %f\n", rgb.x, rgb.y, rgb.z);
-		fwrite(&rgb, sizeof(cfloat3), 1, fp);
+		fwrite(&rgb, sizeof(float), 3, fp);
 	}
 	fclose(fp);
 
 	path = colorFileName + "_den.vol";
 	fp = fopen(path.c_str(), "wb");
-	for (int i = 0; i < colorGrid.numVertices; i++) {
+
+	fwrite(vol, sizeof(char), 3, fp);
+	fwrite(&version, sizeof(version), 1, fp);
+	fwrite(&encodetype, sizeof(encodetype), 1, fp);
+	fwrite(&colorGrid.cellResolution.x, sizeof(int), 1, fp);
+	fwrite(&colorGrid.cellResolution.y, sizeof(int), 1, fp);
+	fwrite(&colorGrid.cellResolution.z, sizeof(int), 1, fp);
+	fwrite(&_channels, sizeof(_channels), 1, fp);
+	fwrite(&colorGrid.xmin.x, sizeof(float), 1, fp);
+	fwrite(&colorGrid.xmin.y, sizeof(float), 1, fp);
+	fwrite(&colorGrid.xmin.z, sizeof(float), 1, fp);
+	fwrite(&colorGrid.xmax.x, sizeof(float), 1, fp);
+	fwrite(&colorGrid.xmax.y, sizeof(float), 1, fp);
+	fwrite(&colorGrid.xmax.z, sizeof(float), 1, fp);
+
+	for (int i = 0; i < colorGrid.numCells; i++) {
 		auto & d = (*colorGrid.density)[i];
 		//fprintf(fp, "%f\n", d);
 		fwrite(&d, sizeof(float), 1, fp);
