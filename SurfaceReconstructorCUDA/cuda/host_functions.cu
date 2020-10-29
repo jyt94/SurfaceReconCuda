@@ -170,7 +170,7 @@ __global__ void  ComputeColorValues(
 			float w_ij = device_sphhelper.Cubic(d) * pVol;
 			for (int t = 0; t < 3; t++)
 				vf.x[t] += p.vf.x[t] * w_ij;
-			density += w_ij;
+			density += w_ij * p.vf.x[0];
 		}
 	}
 
@@ -189,6 +189,7 @@ __global__ void  ComputeColorValues(
 	rgb += cgrid.palette[0] * vf.x[0];
 	rgb += cgrid.palette[1] * vf.x[1];
 	rgb += cgrid.palette[2] * vf.x[2];
+	//rgb = cgrid.palette[0];
 
 	cgrid.device_rgb[i] = rgb;
 	cgrid.device_density[i] = density;

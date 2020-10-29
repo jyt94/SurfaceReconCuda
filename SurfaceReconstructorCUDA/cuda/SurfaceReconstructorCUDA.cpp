@@ -52,22 +52,7 @@ void SurfaceReconstructorCUDA::ExtractSurface() {
 	Release();
 }
 
-void SurfaceReconstructorCUDA::ExtractColor() {
-	LoadParticle();
-	SetupZGrid();
-	SetupColorGrids();
-	
-	SortParticles();
-	ComputeColorValues();
-	OutputColorValues();
-	
-	delete[] surfaceParticleMark;
-	cudaFree(device_surfaceParticleMark);
 
-	particleData.Release();
-	zGrid.Release();
-	colorGrid.Release();
-}
 
 
 void SurfaceReconstructorCUDA::LoadParticle() {
@@ -80,7 +65,7 @@ void SurfaceReconstructorCUDA::LoadParticle() {
 }
 
 void SurfaceReconstructorCUDA::SetupZGrid() {
-	zGrid.BindParticles(particleData);
+	
 	cfloat3 min, max;
 	min = particleData.xmin - padding*2;
 	max = particleData.xmax + padding*2;

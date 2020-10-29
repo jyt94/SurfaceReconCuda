@@ -3,6 +3,7 @@
 #include "catpaw/vec_define.h"
 #include "SurfaceGrids.h"
 #include <map>
+#include <string>
 
 #define OUTSIDE 99
 #define NON_SURFACE 999

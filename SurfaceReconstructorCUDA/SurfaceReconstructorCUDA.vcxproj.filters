@@ -38,6 +38,9 @@
     <ClCompile Include="cuda\MarchingCubeCUDA.cpp">
       <Filter>cuda</Filter>
     </ClCompile>
+    <ClCompile Include="cuda\surfaceRecon_separate.cpp">
+      <Filter>cuda</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="catpaw\cpXMLhelper.h">
@@ -118,5 +121,8 @@
     <CudaCompile Include="cuda\ZIndexGridCUDA.cpp">
       <Filter>cuda</Filter>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="config.xml" />
   </ItemGroup>
 </Project>

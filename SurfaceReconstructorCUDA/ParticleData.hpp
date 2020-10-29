@@ -44,7 +44,8 @@ class ParticleData{
     }
 
 	bool valid(cfloat3& p) {
-		return p.x > -0.5 && p.x < 0.5 && p.y>0 && p.y<2 && p.z>-0.5 && p.z < 0.5;
+		//return p.x > -0.5 && p.x < 0.5 && p.y>0 && p.y<2 && p.z>-0.5 && p.z < 0.5;
+		return p.y > -1 && p.y < 2;
 	}
 
     void LoadFromFile(const char* filePath){
@@ -62,10 +63,14 @@ class ParticleData{
 		float vf[3];
 		int type;
         while(fgets(buf,sizeof(buf),fp)!=NULL){
-            sscanf(buf, "%d %f %f %f %f %f %f %d",
-            &vId, &p.pos.x, &p.pos.y, &p.pos.z,
-				&p.vf.x[0], &p.vf.x[1], &p.vf.x[2], &type);
-			if (type != 0)
+            sscanf(buf, "%d %f %f %f %d",
+            &vId, &p.pos.x, &p.pos.y, &p.pos.z, &type);
+			
+			//if (type != 0)
+			//	continue;
+			//if (p.vf.x[0] + p.vf.x[1] == 0)
+			//	continue;
+			if (p.pos.x < -1.015 || p.pos.x>1.015 || p.pos.z<-1. || p.pos.z>1.)
 				continue;
 
 			if ( !valid(p.pos) )
