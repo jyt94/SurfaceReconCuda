@@ -12,12 +12,12 @@
 
 <small>
 	<particleSpacing> 0.0075 </particleSpacing>
-	<infectRadius> 0.02 </infectRadius>
+	<infectRadius> 0.015 </infectRadius>
 	<padding> 0.01 </padding>
 	<surfaceCellWidth> 0.0075 </surfaceCellWidth>
 	<normThreshold> 0.5 </normThreshold>
 	<neighborThreshold> 50 </neighborThreshold>
-	<isoValue> -0.00 </isoValue>
+	<isoValue> -0.001 </isoValue>
   <!-->color1> 158, 108, 58 </color1>
 	<color2> 20,  255, 0 </color2-->
   <color1>255,0,0</color1>

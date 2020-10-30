@@ -36,8 +36,8 @@ void TestCUDA() {
 	wkd = "D:/jyt/Coding/Simulation/2020/dense_suspension/MPM_case0_impact/MPM/pdata/";
 
 	cout << worker.inputFile << endl;
-	int st = 29; 
-	int ed = 30;
+	int st = 89; 
+	int ed = 100;
 
 	for (int i=st; i<ed; i++) {	
 		char f[100];
